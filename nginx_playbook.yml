@@ -24,7 +24,7 @@
       name: nginx
       state: started
 
-  # - name: Install Ansible
-  #   yum:
-  #     name: ansible
-  #     state: present
+  - name: Install Ansible
+    yum:
+      name: ansible
+      state: present

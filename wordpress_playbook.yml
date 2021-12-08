@@ -27,20 +27,20 @@
   - name: Set permissions for files
     shell: "/usr/bin/find /usr/share/nginx/html/wordpress/ -type f -exec chmod 640 {} \\;"
  
-    # - name: Copy sample config file
-    #   command: mv /var/www/{{ http_host }}/wordpress/wp-config-sample.php /var/www/{{ http_host }}/wordpress/wp-config.php creates=/var/www/{{ http_host }}/wordpress/wp-config.php
-    #   become: yes
+  - name: Copy sample config file
+    command: mv /usr/share/nginx/html/wordpress/wp-config-sample.php /usr/share/nginx/html/wordpress/wp-config.php creates=/usr/share/nginx/html/wordpress/wp-config.php
+    become: yes
  
-    # - name: Update WordPress config file
-    #   lineinfile:
-    #     path: "/var/www/{{ http_host }}/wordpress/wp-config.php"
-    #     regexp: "{{item.regexp}}"
-    #     line: "{{item.line}}"
-    #   with_items:
-    #     - {'regexp': "define\\( 'DB_NAME', '(.)+' \\);", 'line': "define( 'DB_NAME', '{{mysql_db}}' );"}
-    #     - {'regexp': "define\\( 'DB_USER', '(.)+' \\);", 'line': "define( 'DB_USER', '{{mysql_user}}' );"}
-    #     - {'regexp': "define\\( 'DB_PASSWORD', '(.)+' \\);", 'line': "define( 'DB_PASSWORD', '{{mysql_password}}' );"}
+    - name: Update WordPress config file
+      lineinfile:
+        path: "/usr/share/nginx/html/wordpress/wp-config.php"
+        regexp: "{{item.regexp}}"
+        line: "{{item.line}}"
+      with_items:
+        - {'regexp': "define\\( 'DB_NAME', '(.)+' \\);", 'line': "define( 'DB_NAME', 'wordpress' );"}
+        - {'regexp': "define\\( 'DB_USER', '(.)+' \\);", 'line': "define( 'DB_USER', 'root' );"}
+        - {'regexp': "define\\( 'DB_PASSWORD', '(.)+' \\);", 'line': "define( 'DB_PASSWORD', '' );"}
      
-    # - name: Restart httpd service
-    #   systemd: name=httpd state=restarted
-    #   become: yes
+  - name: Restart httpd service
+    systemd: name=httpd state=restarted
+    become: yes
