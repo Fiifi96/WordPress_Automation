@@ -1,8 +1,8 @@
 $scipt_control = <<-SCRIPT
-
-# sed -i "s/.*#host_key_checking.*/host_key_checking = False/g" /etc/ansible/ansible.cfg 
-# ansible-galaxy collection install community.general
-# sudo ansible-galaxy collection install community.mysql
+sudo yum -y install ufw
+sed -i "s/.*#host_key_checking.*/host_key_checking = False/g" /etc/ansible/ansible.cfg 
+ansible-galaxy collection install community.general
+sudo ansible-galaxy collection install community.mysql
 
 SCRIPT
 
@@ -19,21 +19,27 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "wordpress" do |wordpress|     
     wordpress.vm.hostname = "wordpress"
-    #web.vm.network "public_network"
     wordpress.vm.network "private_network", ip: "192.168.50.11";
-    wordpress.vm.provision "shell" , inline: $scipt_control
-    wordpress.vm.provision "ansible_local" do |ansible|
-      ansible.playbook = "dbplaybook.yml"  
-    end
     wordpress.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "nginx_playbook.yml"  
-    end
+    end  
+    wordpress.vm.provision "shell" , inline: $scipt_control  
     wordpress.vm.provision "ansible_local" do |ansible|
-      ansible.playbook = "wordpress_playbook.yml"
+      ansible.playbook = "open_ports.yml"  
+    end
+         wordpress.vm.provision "ansible_local" do |ansible|
+      ansible.playbook = "mariadb_install.yml"  
+    end
+
+    wordpress.vm.provision "ansible_local" do |ansible|
+      ansible.playbook = "php_install.yml"  
+    end
+
+    wordpress.vm.provision "ansible_local" do |ansible|
+      ansible.playbook = "wordpress_playbook.yml"  
     end
 
   end
-
   
 end    
 
@@ -50,12 +56,24 @@ end
 #   # end
 
 # config.vm.define "control" do |control|     
-  #   control.vm.hostname = "control"
-  #   #web.vm.network "public_network"
-  #   control.vm.network "private_network", ip: "192.168.50.12";
-  #   control.vm.provision "shell" , inline: $scipt_control
-  #   control.vm.provision "ansible_local" do |ansible|
-  #     ansible.playbook = "nginx_playbook.yml"  
-  #   end
-  #   control.vm.provision "shell" , inline: "sudo cp /vagrant/hosts /etc/ansible/hosts"
-  # end
+#   control.vm.hostname = "control"
+#   #web.vm.network "public_network"
+#   control.vm.network "private_network", ip: "192.168.50.12";
+#   control.vm.provision "shell" , inline: $scipt_control
+#   control.vm.provision "ansible_local" do |ansible|
+#     ansible.playbook = "ansible_install.yml"  
+#   end
+#   # control.vm.provision "shell" , inline: "sudo cp /vagrant/hosts /etc/ansible/hosts"
+# end
+
+
+#   # wordpress.vm.provision "ansible_local" do |ansible|
+#   #   ansible.playbook = "dbplaybook.yml"  
+#   # end
+
+#   # wordpress.vm.provision "ansible_local" do |ansible|
+#   #   ansible.playbook = "nginx_playbook.yml"  
+#   # end
+#   # wordpress.vm.provision "ansible_local" do |ansible|
+#   #   ansible.playbook = "wordpress_playbook.yml"
+#   # end
