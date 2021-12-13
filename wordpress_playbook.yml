@@ -10,16 +10,16 @@
 
   tasks:
     - name: Run preamble playbooks
-      include: preamble.yml
+      include: open_ports.yml
 
     - name: Run php playbook
-      include: php.yml
+      include: php_install.yml
 
     - name: Run nginx playbook
-      include: nginx.yml
+      include: nginx_playbook.yml
 
     - name: Run mysql playbook
-      include: mysql.yml
+      include: mariadb_install.yml
 
     - name: Download and unpack latest WordPress
       unarchive:
