@@ -1,46 +1,53 @@
 ---
-- name: Install and Config Wordpress
-  hosts: all
-  become: true 
+- hosts: all
+  become: yes
 
+  vars_files:
+    - vars.yml
 
-  # WordPress Configuration
+  handlers:
+    - include: handlers.yml
+
   tasks:
-  - name: Download and unpack latest WordPress
-    unarchive:
-      src: https://wordpress.org/latest.tar.gz
-      dest: "/usr/share/nginx/html/"
-      remote_src: yes
-        # creates: "/var/www/{{ http_host }}/wordpress"
- 
-  - name: Set ownership
-    file:
-      path: "/usr/share/nginx/html/"
-      state: directory
-      recurse: yes
-      owner: nginx
-      group: nginx
- 
-  - name: Set permissions for directories
-    shell: "/usr/bin/find /usr/share/nginx/html/wordpress/ -type d -exec chmod 750 {} \\;"
+    - name: Run preamble playbooks
+      include: preamble.yml
 
-  - name: Set permissions for files
-    shell: "/usr/bin/find /usr/share/nginx/html/wordpress/ -type f -exec chmod 640 {} \\;"
- 
-  - name: Copy sample config file
-    command: mv /usr/share/nginx/html/wordpress/wp-config-sample.php /usr/share/nginx/html/wordpress/wp-config.php creates=/usr/share/nginx/html/wordpress/wp-config.php
-    become: yes
- 
-  - name: Update WordPress config file
-    lineinfile:
-      path: "/usr/share/nginx/html/wordpress/wp-config.php"
-      regexp: "{{item.regexp}}"
-      line: "{{item.line}}"
-    with_items:
-      - {'regexp': "define\\( 'DB_NAME', '(.)+' \\);", 'line': "define( 'DB_NAME', 'wordpress' );"}
-      - {'regexp': "define\\( 'DB_USER', '(.)+' \\);", 'line': "define( 'DB_USER', 'root' );"}
-      - {'regexp': "define\\( 'DB_PASSWORD', '(.)+' \\);", 'line': "define( 'DB_PASSWORD', '' );"}
-    
-  # - name: Restart httpd service
-  #   systemd: name=httpd state=restarted
-  #   become: yes
+    - name: Run php playbook
+      include: php.yml
+
+    - name: Run nginx playbook
+      include: nginx.yml
+
+    - name: Run mysql playbook
+      include: mysql.yml
+
+    - name: Download and unpack latest WordPress
+      unarchive:
+        src: https://wordpress.org/latest.tar.gz
+        dest: "/var/www"
+        remote_src: yes
+        creates: "{{ wordpress_directory }}"
+
+    - name: Set permissions on wordpress directory
+      file:
+        path: "{{ wordpress_directory }}"
+        state: directory
+        recurse: yes
+        mode: 0755
+        owner: nginx
+        group: nginx
+
+    - name: Copy WordPress configuration
+      template:
+        src: files/wp-config.php.j2
+        dest: "{{ wordpress_directory }}/wp-config.php"
+
+    - name: Change permissions on wp-content directory
+      file:
+        path: "{{ wordpress_directory }}/wp-content/plugins"
+        state: directory
+        recurse: yes
+        mode: 0777
+        owner: nginx
+
+    - debug: var=hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address']
