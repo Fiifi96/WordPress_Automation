@@ -16,7 +16,7 @@
       include: php_install.yml
 
     - name: Run nginx playbook
-      include: nginx_playbook.yml
+      include: nginx_playbook.yml 
 
     - name: Run mysql playbook
       include: mariadb_install.yml

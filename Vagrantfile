@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "wordpress" do |wordpress|
     wordpress.vm.hostname = "wordpress.lab"
-    wordpress.vm.network "public_network", bridge: "wlp1s0"
+    wordpress.vm.network "public_network", bridge: "Intel(R) Dual Band Wireless-AC 7265"
     wordpress.vm.provision "ansible_local" do |ansible|
       ansible.playbook = "wordpress_playbook.yml"
     end
