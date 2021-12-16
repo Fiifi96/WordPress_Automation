@@ -1,0 +1,65 @@
+---
+##Nginx PHP
+# tasks file for php
+- name: Install php packages
+  package:
+    name:
+      - php
+      - php-cli
+      - php-curl
+      - php-zip
+      - php-mbstring
+      - php-mysqlnd
+      - php-pecl-http
+      - php-bcmath
+      - php-gd
+      - php-fpm
+    state: present
+
+- name: Start php-fpm service
+  apt:
+    name: php-fpm
+    state: present
+
+- name: Configure php-fpm service
+  template:
+    src: files/www.conf.j2
+    dest: /etc/php/7.4/fpm/pool.d/www.conf
+
+
+
+
+
+## APACHE PHP
+# - name: Installation install software-properties-common
+#   apt: name=software-properties-common
+
+# - name: "Repo PHP 7.4"
+#   apt_repository:
+#     repo="ppa:ondrej/php"
+
+# - name: "Updating the repo"
+#   apt: update_cache=yes
+
+# - name: Installation PHP 7.4
+#   apt: name=php7.4 state=present
+
+# - name: install lamp stack
+#   apt:
+#     pkg:
+#       - php7.4-mysql
+#       - php7.4-curl
+#       - php7.4-json
+#       - php7.4-cgi
+#       - php7.4-xsl
+#       - php7.4-cgi
+#       - php7.4-gd
+#       - php7.4-mbstring
+#       - php7.4-zip
+#       - php7.4-xmlrpc
+#       - php7.4-soap
+#       - php7.4-intl
+#       - libapache2-mod-php
+#     state: present
+#     update_cache: yes 
+

@@ -1,0 +1,32 @@
+---
+- name: "install nginx"
+  apt:
+    name: 'nginx'
+    state: latest
+
+- name: "create www directory"
+  file:
+    path: /var/www/{{ web_domain }}
+    state: directory
+    mode: '0775'
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
+
+- name: delete default nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: nginx reloaded
+
+- name: Configure nginx site.conf
+  template:
+    src: files/default.conf.j2
+    dest: /etc/nginx/sites-enabled/default.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart nginx
+
+
+
+

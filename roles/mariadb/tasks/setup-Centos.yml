@@ -1,0 +1,72 @@
+---
+# tasks file for mariadb
+- name: Install mariaDB server and co
+  package:
+    name:
+      - mariadb-server
+      - php-mysqlnd
+      - python3-devel
+      - python3-pip
+      - python3-setuptools
+    state: present
+
+- name: Install pip PyMySQL package
+  pip:
+    name: PyMySQL
+    state: present
+
+- name: Start mariaDB server
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- name: Update mariaDB root password
+  mysql_user: name=root host={{item}} password={{mysql_root_password}}
+  with_items:
+    - 127.0.0.1
+    -  ::1
+    - localhost
+
+- name: Set ~/.my.cnf
+  template: src=files/my.cnf.j2 dest=/root/.my.cnf mode=0600
+
+- name: Removes anonymous user account for localhost
+  mysql_user:
+    name: ''
+    host: hostname
+    state: absent
+    login_user: root
+    login_password: "{{mysql_root_password}}"
+
+- name: Delete hostname based user
+  mysql_user:
+    name: root
+    host: "{{ansible_nodename}}"
+    state: absent
+    login_user: root
+    login_password: "{{mysql_root_password}}"
+
+- name: Remove mariaDB test database
+  mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{mysql_root_password}}"
+
+- name: Create wordpress database
+  mysql_db:
+    name: "{{wordpress_db_name}}"
+    state: present
+    login_user: root
+    login_password: "{{mysql_root_password}}"
+
+- name: Create wordpress mysql user
+  mysql_user:
+    name: "{{wordpress_db_user}}"
+    password: "{{wordpress_db_password}}"
+    state: present
+    host: localhost
+    priv: "{{wordpress_db_name}}.*:ALL,GRANT"
+    login_user: root
+    login_password: "{{mysql_root_password}}"

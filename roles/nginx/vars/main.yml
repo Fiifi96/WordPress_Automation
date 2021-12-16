@@ -1,0 +1,8 @@
+---
+# vars file for nginx
+nginx_version: "1.20"
+server_name: "wordpress.example.com"
+wordpress_directory: "/var/www/wordpress"
+nginx_user: root
+web_domain: wordpress
+ansible_os_family: Debian

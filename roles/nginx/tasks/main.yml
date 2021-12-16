@@ -1,0 +1,18 @@
+# Setup/install tasks.
+# - name: Include OS-specific variables.
+#   include_vars: "{{ ansible_os_family }}.yml"
+
+# - include_tasks: setup-Debian.yml
+#   when: ansible_os_family == 'Debian'
+
+# - include_tasks: setup-Centos.yml
+#   when: ansible_os_family == 'CentOS'
+
+# - include_tasks: setup-Ubuntu.yml
+#   when: ansible_distribution == 'Ubuntu'
+
+- include_tasks: setup-Debian.yml
+  when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] == "20") # Only Ubuntu 20.04
+
+- include_tasks: setup-Centos.yml
+  when: ansible_facts['distribution'] == "CentOS" # CentOS 8,7,6

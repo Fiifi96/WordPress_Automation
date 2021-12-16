@@ -1,0 +1,6 @@
+---
+# handlers file for open_ports
+- name: Reload firewall
+  service:
+    name: firewalld
+    state: reloaded

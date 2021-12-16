@@ -1,0 +1,40 @@
+---
+- name: "apt-get update"
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+
+- name: Update repositories cache
+  apt: update_cache=yes
+
+- name: Install build-essential
+  apt: name=build-essential state=present
+
+- name: Install the python3-selinux package
+  apt: name=python3-selinux state=present
+
+- name: Install the selinux-policy-default package
+  apt: name=selinux-policy-default state=present
+
+
+
+- name: Disable SELinux
+  selinux: state=disabled
+
+- name: Allow everything and enable UFW
+  ufw:
+    state: enabled
+    policy: allow
+
+- name: ufw rules
+  ufw:
+    rule: "allow"
+    port: "{{ item }}"
+    proto: "tcp"
+  with_items:
+    - "22"
+    - "80"
+    - "443"
+    - "3306"
+  notify: Reload firewall

@@ -1,0 +1,32 @@
+---
+# tasks file for wordpress
+- name: Download and unpack latest WordPress
+  unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: "/var/www"
+    remote_src: yes
+    creates: "{{ wordpress_directory }}"
+
+- name: Set permissions on wordpress directory
+  file:
+    path: "{{ wordpress_directory }}"
+    state: directory
+    recurse: yes
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Copy WordPress configuration
+  template:
+    src: files/wp-config.php.j2
+    dest: "{{ wordpress_directory }}/wp-config.php"
+
+- name: Change permissions on wp-content directory
+  file:
+    path: "{{ wordpress_directory }}/wp-content/plugins"
+    state: directory
+    recurse: yes
+    mode: 0777
+    owner: root
+
+- debug: var=hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address']
