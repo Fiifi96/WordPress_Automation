@@ -9,6 +9,7 @@
       - python3-pip
       - python3-setuptools
       - python3-pymysql
+      - mariadb-client
     state: present
 
 - name: Install pip PyMySQL package
@@ -16,36 +17,37 @@
     name: PyMySQL
     state: present
 
-# - name: Start mariaDB server
-#   service:
-#     name: mariadb
-#     state: started
-#     enabled: yes
-
 - name: start mariadb
   service:
     name: mariadb
     enabled: true
     state: started
 
-- name: mysql_root_password
-  mysql_user:
-    login_user: "{{ mysql_root_user }}"
-    login_password: "{{ mysql_root_password }}"
-    user: "{{ mysql_root_user }}"
-    check_implicit_admin: true
-    password: "{{ mysql_root_password }}"
-    host: localhost
-
-- name: Update mariaDB root password
-  mysql_user: name=root host={{item}} password={{mysql_root_password}}
-  with_items:
-    - 127.0.0.1
-    -  ::1
-    - localhost
 
 - name: Set ~/.my.cnf
   template: src=files/my.cnf.j2 dest=/root/.my.cnf mode=0600
+
+- name: Update mariaDB root password
+  mysql_user:
+    login_user: "{{ mysql_root_user }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    user: "{{ mysql_root_user }}"
+    check_implicit_admin: true
+    password: "{{ mysql_root_password }}"
+    host: "{{item}}"
+  with_items:
+    - 127.0.0.1
+    -  ::1
+    - localhost  
+
+# - name: Update mariaDB root password
+#   mysql_user: name=root host={{item}} password={{mysql_root_password}}
+#   with_items:
+#     - 127.0.0.1
+#     -  ::1
+#     - localhost
+
+
 
 - name: Removes anonymous user account for localhost
   mysql_user:

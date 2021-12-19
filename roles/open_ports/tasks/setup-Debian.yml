@@ -18,7 +18,6 @@
   apt: name=selinux-policy-default state=present
 
 
-
 - name: Disable SELinux
   selinux: state=disabled
 
@@ -37,4 +36,3 @@
     - "80"
     - "443"
     - "3306"
-  notify: Reload firewall
