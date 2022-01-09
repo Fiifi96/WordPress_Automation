@@ -1,6 +1,6 @@
 ---
-- hosts: all
-  become: yes
+- hosts: wordpress
+  become: true
 
   roles:
   - role: open_ports
