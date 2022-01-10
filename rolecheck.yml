@@ -1,0 +1,10 @@
+---
+- hosts: all
+  become: yes
+
+  roles:
+  - role: open_ports
+  - role: nginx
+  - role: php
+  - role: wordpress
+  - role: mariadb
